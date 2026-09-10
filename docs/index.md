@@ -1,86 +1,80 @@
-# Neural Networks and Deep Learning
+# Redes Neurais Artificiais & Deep Learning - Entregas
 
+???+ info inline end "Edição"
 
-???+ info inline end "Edition"
+    **2026.2**
 
-    2026.2
+    [Enunciados :material-open-in-new:](https://insper.github.io/ann-dl/){:target='_blank'}
 
+Este site é o **portfólio** das entregas da disciplina. Ele cresce ao longo do semestre:
+cada exercício e cada projeto vira um item de menu, e o repositório que o gera é parte
+da avaliação — o professor lê o site publicado **e** o repositório (Markdown, código e
+histórico do Git).
 
-## Student
-- Cynthia Naoko Yasutake
+## Identificação
 
-## Individual Deliverables
+Quem responde por este repositório. Os **exercícios são individuais**; a equipe do projeto
+— que pode ser diferente — fica registrada na [página do projeto](projects/index.md).
 
-- [x] Data 
-- [ ] MLP
-- [ ] Perceptron
-- [ ] VAE
+| Nome completo | E-mail | GitHub |
+|---------------|--------|--------|
+| Cynthia Naoko Yasutake| cynthiany@al.insper.edu.br | CYNahko |
 
-## Diagramas
+!!! tip "Como usar este template"
 
-Use o [Mermaid](https://mermaid.js.org/intro/){:target='_blank'} para criar os diagramas de documentação.
+    Este é um **bloco de notas versionado**: registre o que foi feito, o que falta e as
+    decisões tomadas, commitando a cada avanço. O prazo de uma entrega é o *timestamp do
+    último commit que toca a pasta daquela entrega* — não a hora do formulário nem a da
+    publicação no Pages.
 
-[Mermaid Live Editor](https://mermaid.live/){:target='_blank'}
+    Comece por [Como usar este template](template/index.md).
 
+## Status das entregas
 
-``` mermaid
-flowchart TD
-    Deployment:::orange -->|defines| ReplicaSet
-    ReplicaSet -->|manages| pod((Pod))
-    pod:::red -->|runs| Container
-    Deployment -->|scales| pod
-    Deployment -->|updates| pod
+!!! info "Datas, pesos e regras são da sua edição"
 
-    Service:::orange -->|exposes| pod
+    O [overview da edição](https://insper.github.io/ann-dl/){:target='_blank'} traz o
+    calendário, os pesos de cada entrega e as regras de avaliação. Este template não os
+    repete — copie para cá o que a sua turma precisa acompanhar, ou mantenha só o status.
 
-    subgraph  
-        ConfigMap:::orange
-        Secret:::orange
-    end
+    A lista abaixo é o conjunto usual de entregas; acrescente ou remova itens conforme a
+    sua edição, ajustando também as pastas em `docs/` e a `nav` do `mkdocs.yml`.
 
-    ConfigMap --> Deployment
-    Secret --> Deployment
-    classDef red fill:#f55
-    classDef orange fill:#ffa500
-```
+### Exercícios — individuais
 
+- [ ] [Data](exercises/data/index.md)
+- [ ] [Perceptron](exercises/perceptron/index.md)
+- [ ] [MLP](exercises/mlp/index.md)
+- [ ] [VAE](exercises/vae/index.md)
 
+### [Projeto](projects/index.md) — em equipe
 
-## Códigos
+Um projeto, um dataset, três entregas:
 
-=== "De um arquivo remoto"
+- [ ] [EDA](projects/eda/index.md)
+- [ ] [Classificação](projects/classification/index.md) **ou** [Regressão](projects/regression/index.md)
+- [ ] [Generativo](projects/generative/index.md)
 
-    ``` { .yaml .copy .select linenums='1' title="main.yaml" }
-    --8<-- "https://raw.githubusercontent.com/hsandmann/documentation.template/refs/heads/main/.github/workflows/main.yaml"
-    ```
+## Checklist antes de cada entrega
 
-=== "Anotações no código"
+- [ ] Repositório **público** e o GitHub Pages construindo sem erro.
+- [ ] Caminho correto: `docs/exercises/<slug>/index.md` (ou `docs/projects/<slug>/index.md`).
+- [ ] *Front matter* com `exercise:` (ou `project:`) e `ai_use:` preenchidos.
+- [ ] Títulos espelhando a estrutura do enunciado (`## Exercise N`, `### A`, `### B`, ...).
+- [ ] Figuras commitadas em `figures/`, numeradas e exibidas no relatório.
+- [ ] Scripts como arquivos reais em `code/`, referenciados via `--8<--`.
+- [ ] Tabela **Results summary** completa, sem linhas em branco.
+- [ ] Último commit anterior ao prazo.
 
-    ``` { .yaml title="compose.yaml" }
-    name: app
+!!! danger "Escreva para defender"
 
-        db:
-            image: postgres:17
-            environment:
-                POSTGRES_DB: ${POSTGRES_DB:-projeto} # (1)!
-                POSTGRES_USER: ${POSTGRES_USER:-projeto}
-                POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-projeto}
-            ports:
-                - 5432:5432 #(2)!
-    ```
+    As notas da disciplina costumam estar sujeitas a defesa oral, e a nota do projeto, a uma
+    prova sobre o próprio projeto. Escreva relatórios que você consiga sustentar meses
+    depois — o que inclui entender cada linha do código que está no repositório. Confira as
+    regras da sua edição no overview.
 
-    1.  Caso a variável de ambiente `POSTGRES_DB` não exista ou seja nula - não seja definida no arquivo `.env` - o valor padrão será `projeto`. Vide [documentação](https://docs.docker.com/reference/compose-file/interpolation/){target='_blank'}.
+!!! danger "Uso de IA"
 
-    2. Aqui é feito um túnel da porta 5432 do container do banco de dados para a porta 5432 do host (no caso localhost). Em um ambiente de produção, essa porta não deve ser exposta, pois ninguém de fora do compose deveria acessar o banco de dados diretamente.
-
-
-## Exemplo de vídeo
-
-Lorem ipsum dolor sit amet
-
-<iframe width="100%" height="470" src="https://www.youtube.com/embed/3574AYQml8w" allowfullscreen></iframe>
-
-
-## Referências
-
-[Material for MkDocs](https://squidfunk.github.io/mkdocs-material/reference/){:target='_blank'}
+    O campo `ai_use` é **obrigatório** em toda entrega. Colaborar com IA é permitido;
+    não declarar o uso, não. Descreva o que foi gerado, revisado ou depurado com apoio de
+    IA — ou escreva `"none"`.
