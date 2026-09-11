@@ -8,7 +8,6 @@ ai_use: "IA foi utilizada para auxiliar na interpretação do exercício e revis
 
     [Exercises → Data](https://insper.github.io/ann-dl/){:target='_blank'}
 
-!!! tip "Este arquivo é o modelo de relatório"
 
 ## Exercise 1
 

@@ -20,14 +20,6 @@ Quem responde por este repositório. Os **exercícios são individuais**; a equi
 |---------------|--------|--------|
 | Cynthia Naoko Yasutake| cynthiany@al.insper.edu.br | CYNahko |
 
-!!! tip "Como usar este template"
-
-    Este é um **bloco de notas versionado**: registre o que foi feito, o que falta e as
-    decisões tomadas, commitando a cada avanço. O prazo de uma entrega é o *timestamp do
-    último commit que toca a pasta daquela entrega* — não a hora do formulário nem a da
-    publicação no Pages.
-
-    Comece por [Como usar este template](template/index.md).
 
 ## Status das entregas
 
@@ -42,7 +34,7 @@ Quem responde por este repositório. Os **exercícios são individuais**; a equi
 
 ### Exercícios — individuais
 
-- [ ] [Data](exercises/data/index.md)
+- [X] [Data](exercises/data/index.md)
 - [ ] [Perceptron](exercises/perceptron/index.md)
 - [ ] [MLP](exercises/mlp/index.md)
 - [ ] [VAE](exercises/vae/index.md)

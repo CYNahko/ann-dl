@@ -1,8 +1,8 @@
 site_name: ANN-DL · Entregas 
 site_author: Cynthia Naoko, Yasutake
-site_url: https://CYNahko.github.io/neural-networks-deep-learning-cynahko-26.2
-repo_url: https://github.com/CYNahko/neural-networks-deep-learning-cynahko-26.2
-repo_name: github/neural-networks-deep-learning-cynahko-26.2
+site_url: https://CYNahko.github.io/ann-dl
+repo_url: https://github.com/CYNahko/ann-dl
+repo_name: github/ann-dl
 
 theme:
   name: material
@@ -135,7 +135,6 @@ extra_javascript:
 # =============================================================================
 nav:
   - Home: index.md
-  - Como usar este template: template/index.md
 
   # A lista de entregas muda de edição para edição: acrescente ou remova itens
   # aqui e as pastas correspondentes em docs/.
