@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://CYNahko.github.io/neural-networks-deep-learning-cynahko-26.2/</loc>
+         <loc>https://CYNahko.github.io/ann-dl/</loc>
          <lastmod>2026-09-11</lastmod>
     </url>
     <url>
-         <loc>https://CYNahko.github.io/neural-networks-deep-learning-cynahko-26.2/exercises/data/</loc>
+         <loc>https://CYNahko.github.io/ann-dl/exercises/data/</loc>
          <lastmod>2026-09-11</lastmod>
     </url>
     <url>
-         <loc>https://CYNahko.github.io/neural-networks-deep-learning-cynahko-26.2/exercises/data/code/exercise3_preparing_data/</loc>
+         <loc>https://CYNahko.github.io/ann-dl/exercises/data/code/exercise3_preparing_data/</loc>
          <lastmod>2026-09-11</lastmod>
     </url>
     <url>
-         <loc>https://CYNahko.github.io/neural-networks-deep-learning-cynahko-26.2/exercises/data/code/exercise3_rendered/</loc>
+         <loc>https://CYNahko.github.io/ann-dl/exercises/data/code/exercise3_rendered/</loc>
          <lastmod>2026-09-11</lastmod>
     </url>
     <url>
-         <loc>https://CYNahko.github.io/neural-networks-deep-learning-cynahko-26.2/exercises/mlp/</loc>
+         <loc>https://CYNahko.github.io/ann-dl/exercises/mlp/</loc>
          <lastmod>2026-09-11</lastmod>
     </url>
     <url>
-         <loc>https://CYNahko.github.io/neural-networks-deep-learning-cynahko-26.2/exercises/perceptron/</loc>
+         <loc>https://CYNahko.github.io/ann-dl/exercises/perceptron/</loc>
          <lastmod>2026-09-11</lastmod>
     </url>
     <url>
-         <loc>https://CYNahko.github.io/neural-networks-deep-learning-cynahko-26.2/exercises/vae/</loc>
+         <loc>https://CYNahko.github.io/ann-dl/exercises/vae/</loc>
          <lastmod>2026-09-11</lastmod>
     </url>
     <url>
-         <loc>https://CYNahko.github.io/neural-networks-deep-learning-cynahko-26.2/projects/</loc>
+         <loc>https://CYNahko.github.io/ann-dl/projects/</loc>
          <lastmod>2026-09-11</lastmod>
     </url>
     <url>
-         <loc>https://CYNahko.github.io/neural-networks-deep-learning-cynahko-26.2/projects/eda/</loc>
+         <loc>https://CYNahko.github.io/ann-dl/projects/eda/</loc>
          <lastmod>2026-09-11</lastmod>
     </url>
     <url>
-         <loc>https://CYNahko.github.io/neural-networks-deep-learning-cynahko-26.2/projects/generative/</loc>
+         <loc>https://CYNahko.github.io/ann-dl/projects/generative/</loc>
          <lastmod>2026-09-11</lastmod>
     </url>
 </urlset>
