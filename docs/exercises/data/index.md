@@ -62,11 +62,36 @@ A partir do fator `s`= 1 que as núvens começam a deixam de poder ser separadas
 
 ### Abordagem
 
+Foram geradas 500 amostras em 5 dimensões para cada classe, utilizando a semente aleatória 42 para garantir a reprodutibilidade. As direções foram obtidas a partir de vetores gaussianos aleatórios, depois normalizados para terem comprimento 1. Para a classe C, foram utilizados raio com média 2,0 e desvio padrão de 0,4; para a classe D, utilizou o mesmo desvio padrão de 0,4, mas a média utilizada foi 5,0. Por fim, cada ponto foi criado multiplicando sua direção pelo raio sorteado, x=ρu, formando um núcleo e uma casca externa.
+
 ### Código
+
+``` { .python .copy .select linenums='1' title="docs/exercises/data/code/exercise2_non_linear_dimensions.py" }
+--8<-- "docs/exercises/data/code/exercise2_non_linear_dimensions.py"
+```
 
 ### Figuras
 
+![Aplicação da PCA para projeção dos datasets em 2D](figures/datasets_pca.png)
+///caption
+**Figura 4** - Aplicação da PCA para projeção dos datasets em 2D
+///
+
+Após a aplicação da PCA, o Dataset I mantém uma separação horizontal entre as classes A e B, apesar da sobreposição. O primeiro componente do Dataset I explica 50,04% da variância e o segundo explica 15,93%, totalizando 65,97%. No Dataset II, a classe C permanece concentrada no centro, enquanto a classe D expandiu e ocupa regiões mais afastadas, o que evidencia a sua estrutura radial. O PC1 do Dataset 2 explica 21,83% e o PC2 21,32%, somando 43,16%. Todavia, a projeção em duas dimensões descarta parte das distâncias nas outras três dimensões. 
+
+
+![Histograma do raio ||*x*|| de cada ponto](figures/radius_distributions.png)
+///caption
+**Figura 5** - Histograma do raio ||*x*|| de cada ponto
+///
+
 ### Análise
+
+1. Apesar dos centros de ambas classes serem iguais, os histogramas mostram que elas possuem raios diferentes, já que a classe D envolve a classe C em todas as direções, o que comprova que as classes são separáveis pela distância à origemm mas não por um único hiperplano. Para conseguir separá-los, seria necessária uma fronteira não-linear para colocar a classe C dentro e a classe D fora.
+
+2. Por mais dados que se colete, o Dataset II não pode ser resolvido por uma fronteira linear, pois a classe D engloba a classe C em todas as direções. E criar uma fronteira linear deixaria mais evidente a "casca" criada pela classe D. Logo, a solução seria criar uma fronteira não-linear, baseada na distância dos pontos ao centro.
+
+3. Não necessariamente. Uma projeção 2D não prova que elas são inseparáveis no espaço original, pois ao reduzir a dimensionalidade dos dados, pode descartar informações presentes nas outras dimensões e fazer com que pontos que estavam originalmente distantes parecerem estar misturados. No Dataset II, os dois componentes principais preservam apenas 43,15% da variância; portanto, o gráfico de Bowling não representa toda a estrutura 5D. Embora as classes não possam ser separadas por um hiperplano, elas podem ser distinguidas por uma função não linear baseada em \(f(x)=\|x\|^2\), classificando como C os pontos de raio menor e como D os de raio maior.
 
 !!! note "Fronteiras não lineares"
 
@@ -110,10 +135,10 @@ Preencha **todas** as linhas — linha em branco é lida como exercício incompl
 
 | # | Métrica | Valor |
 |---|---------|-------|
-| 1 | Separation ratio (`scale = 0.5`) | 0 |
-| 2 | Separation ratio (`scale = 1.0`) | 0.0675 |
-| 3 | Separation ratio (`scale = 2.0`) | 0.2250 |
-| 4 | Taxa de mistura (`scale = 1.0`) | |
+| 1 | Separation ratio (`scale = 0.5`) | 2.6516 |
+| 2 | Separation ratio (`scale = 1.0`) | 1.3258 |
+| 3 | Separation ratio (`scale = 2.0`) | 0.6629 |
+| 4 | Taxa de mistura (`scale = 1.0`) | 0.0675 |
 | 5 | Distância entre centros — gaussianas 5D | |
 | 6 | Variância explicada — PC1 + PC2 | |
 | 7 | Raio médio — casca interna | |
