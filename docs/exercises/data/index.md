@@ -109,11 +109,42 @@ Após a aplicação da PCA, o Dataset I mantém uma separação horizontal entre
 
 ### Abordagem
 
+Foi utilizado o `train.csv` do Spaceship Titanic, separando os dados em 80% para treino e 20% para teste de forma estratificada, com semente 42. Os valores numéricos ausentes foram preenchidos com a mediana e os categóricos com a moda, sempre ajustando as transformações apenas no treino. As colunas identificadoras foram descartadas, criou-se `TotalSpend`, e os gastos receberam a transformação \(\log(1+x)\). Por fim, as categorias foram convertidas com one-hot encoding e as features numéricas foram padronizadas para adequá-las à rede com ativação `tanh`.
+
 ### Código
+
+``` { .python .copy .select linenums='1' title="docs/exercises/data/code/exercise3_preparing_data.py" }
+--8<-- "docs/exercises/data/code/exercise3_preparing_data.py"
+```
+
 
 ### Figuras
 
+![Histograma de antes e depois da aplicação do log(1+x)](figures/RoomService_before_after_log.png)
+///caption
+**Histograma Item C** - Histograma de antes e depois da aplicação do log(1+x).
+///
+![Histograma de uma feature de cauda pesada antes e depois do pré-processamento](figures/pre_processing_effect.png)
+///caption
+**Figura 6** - Histograma de uma feature de cauda pesada antes e depois do pré-processamento.
+///
+
+
 ### Análise
+
+1. Figura 6 em figuras
+
+2. 
+```
+NaNs no treino: 0
+NaNs no teste: 0
+Shape do treino: (6954, 17)
+Shape do teste: (1739, 17)
+Intervalo no treino: [-1.9961, 12.5430]
+Intervalo no teste: [-1.9961, 9.6711]
+```
+
+3. As decisões com maior impacto no treinamento são a transformação logarítmica e a padronização das features numéricas. O log reduz a influência dos gastos extremamente altos e torna suas distribuições menos assimétricas, enquanto a padronização impede que features de maior escala dominem as demais. Essas transformações concentram os valores em uma faixa mais adequada para a tanh, reduzindo sua saturação e facilitando o aprendizado da rede.
 
 !!! warning "Vazamento de dados"
 
@@ -139,21 +170,20 @@ Preencha **todas** as linhas — linha em branco é lida como exercício incompl
 | 2 | Separation ratio (`scale = 1.0`) | 1.3258 |
 | 3 | Separation ratio (`scale = 2.0`) | 0.6629 |
 | 4 | Taxa de mistura (`scale = 1.0`) | 0.0675 |
-| 5 | Distância entre centros — gaussianas 5D | |
-| 6 | Variância explicada — PC1 + PC2 | |
-| 7 | Raio médio — casca interna | |
-| 8 | Raio médio — casca externa | |
-| 9 | Amostras de treino após o split | |
-| 10 | Amostras de teste após o split | |
-| 11 | Colunas com valores ausentes | |
-| 12 | Features após o encoding | |
-| 13 | Faixa das features após o escalonamento | |
+| 5 | Distância entre centros — gaussianas 5D | 3,2282 |
+| 6 | Variância explicada — PC1 + PC2 | 65,97%(Dataset I); 43,16%(Dataset II) |
+| 7 | Raio médio — casca interna | 1.9848 |
+| 8 | Raio médio — casca externa | 5.0047 |
+| 9 | Amostras de treino após o split | 6954 |
+| 10 | Amostras de teste após o split | 1739 |
+| 11 | Colunas com valores ausentes | 12 antes da imputação, 0 depois |
+| 12 | Features após o encoding | 17 |
+| 13 | Faixa das features após o escalonamento | [-1.9961, 12.5430] |
 
 ## Discussão
 
-O que foi difícil? Onde a intuição falhou? Que decisão você tomaria diferente?
+A principal dificuldade foi compreender a diferença entre a razão de separação, que compara as nuvens de forma geral, e a taxa de mistura, que analisa cada ponto individualmente. A intuição baseada somente na distância entre centros também falhou no Dataset II, pois as classes possuem centros próximos, mas raios muito diferentes. No pré-processamento, a padronização ainda produziu um valor máximo de 12,5430; por isso, eu consideraria aplicar \(\log(1+x)\) também em `TotalSpend` ou comparar a padronização com a normalização para \([-1,1]\).
 
 ## Conclusão
 
-O que este exercício mostrou sobre a relação entre distribuição dos dados e a complexidade
-da fronteira de decisão que a rede precisa aprender?
+O exercício mostrou que a distribuição dos dados determina a complexidade da fronteira de decisão necessária. Classes organizadas em regiões separadas podem ser distinguidas por fronteiras lineares simples, enquanto o aumento da dispersão e da sobreposição torna essa separação mais difícil. No caso das cascas concêntricas, nenhuma fronteira linear consegue separar as classes, sendo necessária uma fronteira não linear baseada no raio. Assim, redes mais flexíveis e um pré-processamento adequado são necessários quando a estrutura dos dados é mais complexa.

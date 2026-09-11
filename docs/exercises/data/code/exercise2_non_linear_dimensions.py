@@ -167,3 +167,9 @@ fig.suptitle("Distribuição dos raios")
 plt.tight_layout()
 fig.savefig(figures / 'radius_distributions.png', dpi=300, bbox_inches='tight')
 plt.show()
+
+mean_radius_c = np.mean(radius_c)
+mean_radius_d = np.mean(radius_d)
+
+print(f"Raio médio da casca interna: {mean_radius_c:.4f}")
+print(f"Raio médio da casca externa: {mean_radius_d:.4f}")
