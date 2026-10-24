@@ -1,6 +1,6 @@
 ---
 exercise: mlp
-ai_use: "Utilizado para explicar os enunciados e os conceitos de MLP, conferir as contas do Exercício 1 e verificar os codigos escritos."
+ai_use: "Utilizado para explicar os enunciados e os conceitos de MLP, conferir as contas do Exercício 1, verificar os codigos e os textos escritos"
 ---
 
 # 3. MLP
@@ -137,10 +137,11 @@ Regra: \(\theta \leftarrow \theta - \eta\,\dfrac{\partial L}{\partial \theta}\),
 
 ### Abordagem
 
-<!-- Dados em 3 grupos (classe 0 no meio, classe 1 nas pontas), split 80/20,
-     linha de base com regressão logística, MLP do zero com sigmoide + entropia cruzada binária. -->
+Foram gerados 1000 pontos em três grupos: a Classe 0 no centro e a Classe 1 dividida em dois grupos em cantos opostos. Os dados foram separados em 80% para treino e 20% para teste. Primeiro, uma regressão logística foi usada como linha de base linear. Em seguida, foi treinado um MLP implementado do zero em NumPy, com passagem direta, perda, retropropagação e atualização dos parâmetros escritas à mão. A classe recebe os tamanhos das camadas como argumento, para ser reaproveitada nos Exercícios 3 e 4.
 
 ### A - Gere os dados
+
+Os dados foram gerados com `make_blobs`, usando centros \((0, 0)\), \((3, 3)\) e \((-3, -3)\), com 500, 250 e 250 pontos, respectivamente, desvio padrão \(1.2\) e `random_state=42`. O primeiro grupo forma a Classe 0, e os outros dois formam a Classe 1 (\(y = 1\) se o grupo for diferente de 0). A divisão treino/teste usou `train_test_split` com `test_size=0.2`, `random_state=42` e `stratify=y`, resultando em 800 pontos de treino e 200 de teste.
 
 ![Dispersão dos 1000 pontos](figures/fig1_dispersao.png)
 /// caption
@@ -149,12 +150,23 @@ Regra: \(\theta \leftarrow \theta - \eta\,\dfrac{\partial L}{\partial \theta}\),
 
 ### B - Estabeleça a linha de base
 
-<!-- Escreva o número: "A regressão logística obteve XX,X% de acurácia no teste." -->
+A linha de base foi uma regressão logística (`LogisticRegression`), treinada no conjunto de treino. Ela aprendeu pesos \([0.0296,\ 0.0015]\) e bias \(-0.0031\), e obteve **47,5%** de acurácia no teste.
 
 ### C - Implemente o MLP
 
-<!-- Arquitetura (ex.: 2-8-1), ativação oculta, taxa de aprendizado, épocas e acurácia no teste.
-     Os números precisam estar no texto, não só na saída do código. -->
+| Item | Valor |
+|---|---|
+| Arquitetura | 2-8-1 (2 entradas, 8 neurônios ocultos, 1 saída) |
+| Ativação oculta | \(\tanh\) |
+| Ativação de saída | sigmoide |
+| Perda | entropia cruzada binária |
+| Inicialização | pesos \(\sim \mathcal{N}(0,\ 1/\sqrt{n_{in}})\), bias zero, `rng = np.random.default_rng(42)` |
+| Taxa de aprendizado | \(\eta = 0.5\) |
+| Épocas | 2000 (gradiente descendente com o conjunto de treino inteiro) |
+| Perda de treino | \(0.7930 \rightarrow 0.1043\) |
+| Acurácia no teste | **91,5%** |
+
+A Figura 2 mostra a perda caindo ao longo das épocas, indicando que o treinamento convergiu. A Figura 3 mostra as regiões de decisão aprendidas, calculadas sobre uma grade de \(300 \times 300\) pontos, com os pontos de teste sobrepostos.
 
 ![Perda de treino por época](figures/fig2_perda_binario.png)
 /// caption
@@ -168,9 +180,11 @@ Regra: \(\theta \leftarrow \theta - \eta\,\dfrac{\partial L}{\partial \theta}\),
 
 ### D - Análise
 
-<!-- Por que a reta fica abaixo de 50%? Por que o MLP passa de 90%?
-     Que formato tem a região da classe 1 na Figura 3 e por que nenhuma reta faz isso?
-     Explique pela geometria (grupo no meio, duas pontas opostas), não só "é não linear". -->
+**Por que a linha de base fica abaixo de 50%.** A Classe 1 está dividida em dois grupos em cantos opostos do plano, um em torno de \((3, 3)\) e outro em torno de \((-3, -3)\), e a Classe 0 fica no meio, perto da origem. Uma fronteira linear só consegue dividir o plano em dois semiplanos. Para deixar os dois grupos da Classe 1 do mesmo lado, ela teria que cortar a Classe 0 ao meio. Na prática, cada grupo puxa a reta para um lado e um efeito anula o outro: os pesos aprendidos terminaram quase zerados (\([0.0296,\ 0.0015]\)), e a fronteira acabou passando bem no meio do grupo azul. Por isso, mais ou menos metade da Classe 0 e um grupo inteiro da Classe 1 ficam do lado errado, e o modelo não vai além de um chute. Os 47,5%, um pouco abaixo de 50%, são só variação do conjunto de teste.
+
+**Por que o MLP passa de 90%.** Cada neurônio da camada oculta calcula \(\tanh(\mathbf{w}^\top\mathbf{x} + b)\), ou seja, diz de que lado de uma reta o ponto está. A camada de saída junta essas respostas. Com duas retas paralelas, a rede já consegue expressar algo como "é Classe 1 se estiver acima da primeira reta **ou** abaixo da segunda", que é justamente o que uma reta sozinha não dá conta de fazer. Com 8 neurônios, sobra espaço para as bordas se ajustarem melhor aos grupos e até ficarem levemente curvas. No fim, o MLP chegou a 91,5% de acurácia no teste.
+
+**Forma da região da Classe 1.** Na Figura 3, dá para ver que a Classe 0 ocupa uma faixa diagonal em volta da origem, enquanto a Classe 1 aparece em duas regiões separadas, uma de cada lado dessa faixa. Ou seja, a região da Classe 1 é desconexa. Já o lado de uma reta é sempre um único semiplano, conexo, e por isso nenhuma fronteira linear conseguiria reproduzi-la. Os 8,5% de erro que sobram no MLP se concentram perto das bordas da faixa, onde os grupos se sobrepõem por causa do espalhamento (\(\sigma = 1.2\)). Esses pontos caíram no território da outra classe, e não existe fronteira que os acerte sem errar outros no lugar.
 
 ### Código
 
@@ -182,8 +196,8 @@ Regra: \(\theta \leftarrow \theta - \eta\,\dfrac{\partial L}{\partial \theta}\),
 
 #### Geração e treinamento do Exercise 2
 
-``` { .python .copy .select linenums='1' title="docs/exercises/mlp/code/exercise2_binary.py" }
---8<-- "docs/exercises/mlp/code/exercise2_binary.py"
+``` { .python .copy .select linenums='1' title="docs/exercises/mlp/code/ex2_binary.py" }
+--8<-- "docs/exercises/mlp/code/ex2_binary.py"
 ```
 
 ## Exercise 3
@@ -225,7 +239,7 @@ Regra: \(\theta \leftarrow \theta - \eta\,\dfrac{\partial L}{\partial \theta}\),
 ### Código
 
 ``` { .python .copy .select linenums='1' title="docs/exercises/mlp/code/exercise3_multiclass.py" }
---8<-- "docs/exercises/mlp/code/exercise3_multiclass.py"
+--8<-- "docs/exercises/mlp/code/ex3_multiclass.py"
 ```
 
 ## Exercise 4
@@ -260,7 +274,7 @@ Regra: \(\theta \leftarrow \theta - \eta\,\dfrac{\partial L}{\partial \theta}\),
 ### Código
 
 ``` { .python .copy .select linenums='1' title="docs/exercises/mlp/code/exercise4_depth.py" }
---8<-- "docs/exercises/mlp/code/exercise4_depth.py"
+--8<-- "docs/exercises/mlp/code/ex4_depth.py"
 ```
 
 ## Results summary
@@ -270,8 +284,8 @@ Regra: \(\theta \leftarrow \theta - \eta\,\dfrac{\partial L}{\partial \theta}\),
 | 1 | Ex. 1: \(\mathbf{z}^{(1)}\) e \(\mathbf{h}^{(1)}\) | \(\mathbf{z}^{(1)} = [0.2700,\ -0.1800]\), \(\mathbf{h}^{(1)} = [0.2636,\ -0.1781]\) |
 | 2 | Ex. 1: \(u^{(2)}\), \(\hat{y}\) e \(L\) | \(0.3852\), \(0.3672\), \(0.4004\) |
 | 3 | Ex. 1: parâmetros atualizados | \(\mathbf{W}^{(1)} = [[0.3764,\ -0.1306],[0.1523,\ 0.4191]]\), \(\mathbf{b}^{(1)} = [0.2528,\ -0.2954]\), \(\mathbf{W}^{(2)} = [0.5866,\ -0.3585]\), \(b^{(2)} = 0.5284\) |
-| 4 | Ex. 2: acurácia da linha de base linear | |
-| 5 | Ex. 2: arquitetura e acurácia no teste | |
+| 4 | Ex. 2: acurácia da linha de base linear | 47,5% |
+| 5 | Ex. 2: arquitetura e acurácia no teste | 2-8-1 (tanh / sigmoide), 91,5% |
 | 6 | Ex. 3: arquitetura e acurácia no teste | |
 | 7 | Ex. 3: par de classes mais confundido | |
 | 8 | Ex. 4: arquitetura e acurácia no teste | |
