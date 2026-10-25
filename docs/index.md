@@ -13,8 +13,7 @@ histórico do Git).
 
 ## Identificação
 
-Quem responde por este repositório. Os **exercícios são individuais**; a equipe do projeto
-— que pode ser diferente — fica registrada na [página do projeto](projects/index.md).
+Quem responde por este repositório. Os **exercícios são individuais**.
 
 | Nome completo | E-mail | GitHub |
 |---------------|--------|--------|
@@ -38,14 +37,6 @@ Quem responde por este repositório. Os **exercícios são individuais**; a equi
 - [ ] [Perceptron](exercises/perceptron/index.md)
 - [ ] [MLP](exercises/mlp/index.md)
 - [ ] [VAE](exercises/vae/index.md)
-
-### [Projeto](projects/index.md) — em equipe
-
-Um projeto, um dataset, três entregas:
-
-- [ ] [EDA](projects/eda/index.md)
-- [ ] [Classificação](projects/classification/index.md) **ou** [Regressão](projects/regression/index.md)
-- [ ] [Generativo](projects/generative/index.md)
 
 ## Checklist antes de cada entrega
 

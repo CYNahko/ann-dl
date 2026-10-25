@@ -1,6 +1,8 @@
 ---
 exercise: mlp
-ai_use: "Utilizado para explicar os enunciados e os conceitos de MLP, conferir as contas do Exercício 1, verificar os codigos e os textos escritos"
+ai_use: "Utilizado para explicar os enunciados e os conceitos de MLP, implementar a classe MLP e os scripts dos exercícios, conferir as contas do Exercício 1 e redigir a maior parte do relatório, que foi revisado pela aluna."
+
+
 ---
 
 # 3. MLP
@@ -204,8 +206,7 @@ A Figura 2 mostra a perda caindo ao longo das épocas, indicando que o treinamen
 
 ### Abordagem
 
-<!-- 1500 amostras, 4 atributos, 3 classes; mesma classe MLP com saída softmax
-     e entropia cruzada categórica. -->
+Foram geradas 1500 amostras com 4 atributos e 3 classes, cada classe formada por 2 grupos. A mesma classe `MLP` do Exercício 2 foi reaproveitada sem alterações, mudando apenas o tamanho da saída (3 unidades), a ativação de saída (softmax) e a perda (entropia cruzada categórica). O modelo foi avaliado pela acurácia no teste e pela matriz de confusão, e comparado com uma regressão logística como linha de base.
 
 ### A - Gere os dados
 
@@ -315,34 +316,50 @@ Isso tem a ver com a estrutura dos dados. O `make_classification` coloca os 6 gr
 
 ### Abordagem
 
-<!-- Mesmos dados, semente, épocas e taxa do Ex. 3; só muda o número de camadas ocultas.
-     Explique como tratou as 3 sementes. -->
+Foram usados os mesmos dados, a mesma divisão treino/teste, a mesma taxa de aprendizado (\(\eta = 0.5\)) e o mesmo número de épocas (2000) do Exercício 3. A única mudança foi a profundidade: uma segunda camada oculta de 16 neurônios. Para que a comparação não dependesse de uma inicialização específica, as duas redes foram treinadas com 3 sementes (42, 43 e 44). A semente altera apenas a inicialização dos pesos (`np.random.default_rng(seed)`); os dados continuam fixos com `random_state=42`. Os resultados reportados são as médias das 3 execuções.
 
 ### A - Treine a rede mais profunda
 
-<!-- Arquitetura (ex.: 4-16-16-3) e acurácia no teste. -->
+| Item | Valor |
+|---|---|
+| Arquitetura | 4-16-16-3 (4 entradas, duas camadas ocultas de 16 neurônios, 3 saídas) |
+| Ativações | \(\tanh\) nas duas camadas ocultas, softmax na saída |
+| Perda | entropia cruzada categórica |
+| Taxa de aprendizado / épocas | \(\eta = 0.5\), 2000 épocas |
+| Acurácia no teste por semente (42, 43, 44) | 85,33%, 84,67%, 85,67% |
+| **Acurácia no teste (média)** | **85,22% ± 0,42%** |
 
 ### B - Compare
 
 ![Curvas de perda Ex. 3 vs Ex. 4](figures/fig6_comparacao.png)
 /// caption
-**Figura 6** — Perda de treino das redes do Exercício 3 e do Exercício 4.
+**Figura 6** — Perda de treino média (3 sementes) das redes do Exercício 3 e do Exercício 4.
 ///
 
-| Rede | Camadas ocultas | Nº de parâmetros | Perda final (média) | Acurácia teste (média) |
+| Rede | Camadas ocultas | Nº de parâmetros | Perda final de treino (média) | Acurácia no teste (média ± dp) |
 |---|---|---|---|---|
-| Ex. 3 | 1 | | | |
-| Ex. 4 | 2 | | | |
+| Ex. 3 (4-16-3) | 1 | 131 | 0,2617 | 84,89% ± 0,87% |
+| Ex. 4 (4-16-16-3) | 2 | 403 | 0,1723 | 85,22% ± 0,42% |
+
+Diferença de acurácia (Ex. 4 − Ex. 3): **+0,33 ponto percentual**.
+
+Os parâmetros foram contados como \(\sum (n_{in} \cdot n_{out} + n_{out})\) por camada. Por exemplo, a rede do Ex. 3 tem \((4 \cdot 16 + 16) + (16 \cdot 3 + 3) = 80 + 51 = 131\).
 
 ### C - Análise
 
-<!-- Por que a rede mais funda não ganhou (ou ganhou)? Considere:
-     nº de grupos e complexidade da fronteira; o que a 2ª camada acrescenta vs. o custo de otimizar;
-     se perda de treino e acurácia contam a mesma história; que dado recompensaria profundidade. -->
+**A rede mais profunda praticamente empatou.** A diferença de +0,33 ponto é menor que a variação entre sementes da própria rede rasa (desvio padrão de 0,87 ponto). Por exemplo, a rede rasa com semente 42 (85,67%) superou a rede profunda com semente 43 (84,67%). Não há evidência de que a segunda camada melhore a classificação, mesmo com cerca de 3 vezes mais parâmetros (403 contra 131).
+
+**Complexidade da fronteira.** Os dados têm 6 grupos, perto dos vértices de um hipercubo em 4 dimensões. Para separá-los basta isolar cada grupo da vizinhança, o que uma única camada oculta com 16 hiperplanos já consegue fazer. A fronteira necessária não é complexa a ponto de exigir composição de características. O que limita a acurácia (cerca de 85%) é a sobreposição entre grupos vizinhos de classes diferentes, e nenhuma arquitetura separa pontos que estão misturados no mesmo lugar do espaço.
+
+**O que a segunda camada acrescenta e o que custa.** A segunda camada permite combinar as regiões da primeira e formar fronteiras mais elaboradas, mas aumenta o número de parâmetros e torna a otimização mais difícil: o gradiente precisa atravessar mais uma derivada do \(\tanh\), e a superfície de perda fica mais irregular. Isso aparece na Figura 6: a curva da rede profunda tem picos (por volta das épocas 320, 400 e 850), sinal de passos instáveis com \(\eta = 0.5\), enquanto a curva da rede rasa é suave.
+
+**Perda de treino e acurácia contam histórias diferentes.** A rede profunda atingiu uma perda de treino bem menor (0,1723 contra 0,2617), mas isso não se converteu em acurácia no teste. A capacidade extra foi usada para ajustar melhor o conjunto de treino, inclusive os pontos na região de sobreposição, o que não generaliza para pontos novos. Uma perda de treino menor indica um ajuste mais apertado aos dados vistos, não necessariamente um modelo melhor.
+
+**Que tipo de dado recompensaria a profundidade.** Dados com estrutura hierárquica ou composicional, em que as características úteis são combinações de combinações: por exemplo, imagens (bordas → formas → objetos), ou fronteiras muito mais complexas, com muitos grupos entrelaçados, que exigiriam um número enorme de neurônios numa única camada. Também ajudaria ter mais dados, para que a capacidade extra fosse usada em padrões reais em vez de ruído.
 
 ### Código
 
-``` { .python .copy .select linenums='1' title="docs/exercises/mlp/code/exercise4_depth.py" }
+``` { .python .copy .select linenums='1' title="docs/exercises/mlp/code/ex4_depth.py" }
 --8<-- "docs/exercises/mlp/code/ex4_depth.py"
 ```
 
@@ -357,16 +374,21 @@ Isso tem a ver com a estrutura dos dados. O `make_classification` coloca os 6 gr
 | 5 | Ex. 2: arquitetura e acurácia no teste | 2-8-1 (tanh / sigmoide), 91,5% |
 | 6 | Ex. 3: arquitetura e acurácia no teste | 4-16-3 (tanh / softmax), 85,67% |
 | 7 | Ex. 3: par de classes mais confundido | Classe 0 ↔ Classe 1 (18 erros) |
-| 8 | Ex. 4: arquitetura e acurácia no teste | |
-| 9 | Ex. 4: diferença de acurácia em relação ao Ex. 3 (média de 3 sementes) | |
+| 8 | Ex. 4: arquitetura e acurácia no teste | 4-16-16-3 (tanh / tanh / softmax), 85,22% (média de 3 sementes) |
+| 9 | Ex. 4: diferença de acurácia em relação ao Ex. 3 (média de 3 sementes) | +0,33 ponto percentual (85,22% contra 84,89%) |
 
 ## Discussão
 
-<!-- Um parágrafo ligando os exercícios: o Ex. 1 mostra o mecanismo (um passo);
-     o Ex. 2 mostra por que a camada oculta importa (fronteira não linear);
-     o Ex. 3 mostra que a mesma rede serve para multiclasse;
-     o Ex. 4 mostra que mais profundidade nem sempre ajuda. -->
+Os quatro exercícios formam uma sequência: o Exercício 1 mostra o mecanismo de aprendizado em um único passo, o Exercício 2 mostra por que a camada oculta é necessária, o Exercício 3 mostra que a mesma rede se estende para várias classes, e o Exercício 4 mostra que aumentar a profundidade nem sempre ajuda. Ao longo do trabalho, alguns pontos foram mais difíceis de entender e merecem registro.
+
+**A retropropagação.** O ponto mais difícil foi entender o que a retropropagação faz de fato. No começo, as fórmulas do Exercício 1 pareciam uma sequência de contas sem sentido. O que ajudou foi interpretá-las como uma distribuição de "culpa": o erro é medido na saída e enviado de volta camada por camada, e a regra da cadeia diz quanto desse erro cabe a cada peso. Cada etapa multiplica a culpa recebida pela derivada da ativação (\(1 - \tanh^2\)) e pelos pesos que ligam as camadas. Fazer as contas à mão e depois ver que o método `backward` da classe `MLP` repete exatamente as mesmas operações dentro de um loop foi o que tornou a ideia concreta.
+
+**O papel da camada oculta.** Também não era óbvio por que uma camada oculta permite fronteiras não lineares. A interpretação que ficou clara foi: cada neurônio oculto define um único hiperplano e responde de que lado dele o ponto está; a camada seguinte combina essas respostas. Com duas retas, já é possível descrever uma faixa ("acima de uma ou abaixo da outra"), algo que uma reta sozinha não faz. O número de neurônios (8 no Exercício 2) não corresponde ao número de regiões finais: ele só dá flexibilidade para ajustar e curvar as bordas.
+
+**Softmax e entropia cruzada.** A derivação de \(\partial L/\partial u = \hat{y} - y\) parecia abstrata até ficar claro o seu significado: o gradiente empurra para cima a probabilidade da classe correta e para baixo as das outras, na proporção do erro. O fato de sigmoide com entropia cruzada binária levar ao mesmo resultado explica por que o código da rede pôde ser reaproveitado sem mudanças entre os Exercícios 2 e 3.
+
+**Ler os resultados com cuidado.** Por fim, foi preciso aprender a não confiar em um único número. Na matriz de confusão, as linhas são as classes verdadeiras e as colunas as previstas, e os erros só fazem sentido quando relacionados à posição dos grupos no espaço. No Exercício 4, a perda de treino sugeria que a rede profunda era melhor, mas a acurácia no teste, avaliada com várias sementes, mostrou que a diferença estava dentro da variação aleatória.
 
 ## Conclusão
 
-<!-- 2–3 frases com o principal aprendizado. -->
+Um MLP aprende repetindo um ciclo simples (passagem direta, cálculo da perda, retropropagação e atualização dos pesos), e é a combinação de várias fronteiras lineares na camada oculta que permite separar dados que uma reta não separa: de 47,5% para 91,5% no Exercício 2 e de 66,33% para 85,67% no Exercício 3. Mais capacidade, porém, não é garantia de melhora: a segunda camada oculta reduziu a perda de treino sem ganho significativo no teste, porque a dificuldade do problema estava na sobreposição entre grupos e não na complexidade da fronteira.
