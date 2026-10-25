@@ -209,17 +209,81 @@ A Figura 2 mostra a perda caindo ao longo das épocas, indicando que o treinamen
 
 ### A - Gere os dados
 
-<!-- Parâmetros do make_classification e o split usado. -->
+Os dados foram gerados com `make_classification`, usando `n_samples=1500`, `n_features=4`, `n_informative=4`, `n_redundant=0`, `n_repeated=0`, `n_classes=3`, `n_clusters_per_class=2`, `class_sep=1.0` e `random_state=42`. São 3 classes com 500 amostras cada, e cada classe é formada por 2 grupos, totalizando 6 grupos em um espaço de 4 dimensões. A divisão treino/teste usou `train_test_split` com `test_size=0.2`, `random_state=42` e `stratify=y`, resultando em 1200 amostras de treino e 300 de teste (100 por classe).
 
 ### B - Adapte a rede
 
-<!-- O que mudou (3 saídas, softmax, entropia cruzada categórica) e o que NÃO mudou
-     (forward/backward/update iguais → ponto extra).
-     Derivação de ∂L/∂u para softmax + entropia cruzada: o resultado é ŷ − y. -->
+Em relação ao Exercício 2, só a saída da rede mudou:
+
+| | Exercício 2 | Exercício 3 |
+|---|---|---|
+| Unidades de saída | 1 | 3 (uma por classe) |
+| Ativação de saída | sigmoide | softmax |
+| Perda | entropia cruzada binária | entropia cruzada categórica |
+| Alvo | \(y \in \{0, 1\}\) | \(\mathbf{y}\) em one-hot |
+
+A softmax transforma as pré-ativações de saída \(\mathbf{u} = (u_1, u_2, u_3)\) em probabilidades que somam 1:
+
+\[
+\hat{y}_k = \frac{e^{u_k}}{\sum_j e^{u_j}}
+\]
+
+e a entropia cruzada categórica, para uma amostra com alvo one-hot \(\mathbf{y}\), é:
+
+\[
+L = -\sum_k y_k \log \hat{y}_k
+\]
+
+**Derivação de \(\partial L / \partial u_i\).** Tomando o log da softmax:
+
+\[
+\log \hat{y}_k = u_k - \log \sum_j e^{u_j}
+\]
+
+Substituindo na perda:
+
+\[
+L = -\sum_k y_k u_k + \Big(\sum_k y_k\Big) \log \sum_j e^{u_j}
+\]
+
+Como \(\mathbf{y}\) é one-hot, \(\sum_k y_k = 1\), então:
+
+\[
+L = -\sum_k y_k u_k + \log \sum_j e^{u_j}
+\]
+
+Derivando em relação a \(u_i\): o primeiro termo dá \(-y_i\), e o segundo dá \(\dfrac{e^{u_i}}{\sum_j e^{u_j}} = \hat{y}_i\). Portanto:
+
+\[
+\boxed{\frac{\partial L}{\partial u_i} = \hat{y}_i - y_i}
+\]
+
+Esse é o mesmo gradiente obtido no Exercício 2 com sigmoide e entropia cruzada binária (\(\partial L/\partial u = \hat{y} - y\)). Por isso, o início da retropropagação é idêntico nos dois casos.
+
+**Reaproveitamento do código.** O arquivo `mlp.py` não foi alterado entre os Exercícios 2 e 3: os métodos `forward`, `backward` e `update` são exatamente os mesmos. A única diferença está nos argumentos passados à classe:
+
+```python
+model = MLP(layer_sizes=[4, 16, 3], rng=rng, learning_rate=0.5, epochs=2000, output="softmax")
+```
+
+Com `output="softmax"`, a classe aplica softmax na última camada, usa a entropia cruzada categórica e converte os rótulos para one-hot. O `backward` começa com \(\boldsymbol{\delta} = (\hat{\mathbf{y}} - \mathbf{y})/N\) nos dois exercícios, conforme a derivação acima.
 
 ### C - Treine e avalie
 
-<!-- Arquitetura, hiperparâmetros e acurácia no teste. -->
+| Item | Valor |
+|---|---|
+| Arquitetura | 4-16-3 (4 entradas, 16 neurônios ocultos, 3 saídas) |
+| Ativação oculta | \(\tanh\) |
+| Ativação de saída | softmax |
+| Perda | entropia cruzada categórica |
+| Inicialização | pesos \(\sim \mathcal{N}(0,\ 1/\sqrt{n_{in}})\), bias zero, `rng = np.random.default_rng(42)` |
+| Taxa de aprendizado | \(\eta = 0.5\) |
+| Épocas | 2000 (gradiente descendente com o conjunto de treino inteiro) |
+| Perda de treino | \(1.1166 \rightarrow 0.2597\) |
+| Acurácia no teste | **85,67%** |
+
+A acurácia ficou dentro da faixa esperada (83–86%). A Figura 4 mostra a perda de treino caindo ao longo das épocas, e a Figura 5 mostra a matriz de confusão no conjunto de teste: a diagonal (90, 77 e 90) corresponde aos acertos de cada classe, e a Classe 1 é a que tem mais erros.
+
 
 ![Perda de treino por época - multiclasse](figures/fig4_perda_multiclasse.png)
 /// caption
@@ -233,12 +297,17 @@ A Figura 2 mostra a perda caindo ao longo das épocas, indicando que o treinamen
 
 ### D - Análise
 
-<!-- Par de classes mais confundido e por quê (4 dimensões, 2 grupos por classe = 6 grupos).
-     Acurácia da logística (≈66%) e o que a camada oculta acrescentou. -->
+**Par mais confundido.** Pela Figura 5, o par que o modelo mais confunde é Classe 0 ↔ Classe 1 (6 + 12 = 18 erros), seguido de perto por Classe 1 ↔ Classe 2 (11 + 5 = 16). Já Classe 0 ↔ Classe 2 é o par menos confundido (4 + 5 = 9). A Classe 1 é a que tem menos acertos (77 de 100), já que é trocada tanto pela Classe 0 quanto pela Classe 2.
+
+Isso tem a ver com a estrutura dos dados. O `make_classification` coloca os 6 grupos (3 classes × 2 grupos) perto dos vértices de um hipercubo em 4 dimensões, com coordenadas próximas de \(\pm 1\). Estimando os centros dos grupos com K-means, dá para ver que um dos grupos da Classe 1 difere de um grupo da Classe 0 em apenas uma coordenada, e o outro grupo da Classe 1 difere de um grupo da Classe 2 também em uma só. Ou seja, são vértices vizinhos, e os pontos acabam se sobrepondo na fronteira entre eles. Os grupos da Classe 0 e da Classe 2, por outro lado, diferem em pelo menos duas coordenadas e ficam mais afastados. É por isso que a Classe 1 fica "no meio" e concentra a maior parte dos erros.
+
+**Linha de base.** A regressão logística chegou a **66,33%** no teste, contra **85,67%** do MLP, um ganho de cerca de 19 pontos percentuais.
+
+**O que a camada oculta acrescentou.** Assim como no Exercício 2, cada classe é formada por dois grupos separados. Um modelo linear atribui a cada classe uma única região delimitada por hiperplanos, então não consegue cercar dois grupos distantes da mesma classe sem acabar incluindo grupos de outras classes no caminho. A camada oculta resolve isso combinando várias fronteiras lineares (cada neurônio define um hiperplano), o que permite isolar cada grupo separadamente. Os erros que sobram ficam justamente onde grupos vizinhos de classes diferentes se sobrepõem.
 
 ### Código
 
-``` { .python .copy .select linenums='1' title="docs/exercises/mlp/code/exercise3_multiclass.py" }
+``` { .python .copy .select linenums='1' title="docs/exercises/mlp/code/ex3_multiclass.py" }
 --8<-- "docs/exercises/mlp/code/ex3_multiclass.py"
 ```
 
@@ -286,8 +355,8 @@ A Figura 2 mostra a perda caindo ao longo das épocas, indicando que o treinamen
 | 3 | Ex. 1: parâmetros atualizados | \(\mathbf{W}^{(1)} = [[0.3764,\ -0.1306],[0.1523,\ 0.4191]]\), \(\mathbf{b}^{(1)} = [0.2528,\ -0.2954]\), \(\mathbf{W}^{(2)} = [0.5866,\ -0.3585]\), \(b^{(2)} = 0.5284\) |
 | 4 | Ex. 2: acurácia da linha de base linear | 47,5% |
 | 5 | Ex. 2: arquitetura e acurácia no teste | 2-8-1 (tanh / sigmoide), 91,5% |
-| 6 | Ex. 3: arquitetura e acurácia no teste | |
-| 7 | Ex. 3: par de classes mais confundido | |
+| 6 | Ex. 3: arquitetura e acurácia no teste | 4-16-3 (tanh / softmax), 85,67% |
+| 7 | Ex. 3: par de classes mais confundido | Classe 0 ↔ Classe 1 (18 erros) |
 | 8 | Ex. 4: arquitetura e acurácia no teste | |
 | 9 | Ex. 4: diferença de acurácia em relação ao Ex. 3 (média de 3 sementes) | |
 
