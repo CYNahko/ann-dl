@@ -1,8 +1,6 @@
 ---
 exercise: mlp
 ai_use: "Utilizado para explicar os enunciados e os conceitos de MLP, implementar a classe MLP e os scripts dos exercícios, conferir as contas do Exercício 1 e redigir a maior parte do relatório, que foi revisado pela aluna."
-
-
 ---
 
 # 3. MLP
